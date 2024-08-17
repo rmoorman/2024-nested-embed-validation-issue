@@ -80,9 +80,16 @@ defmodule HelloWeb.FormLive do
     {:noreply, socket}
   end
 
+  def handle_event("submit", params, socket) do
+    changeset = Schema.changeset(%Schema{}, params["schema"]) |> Map.put(:action, :validate)
+    form = to_form(changeset)
+    socket = assign(socket, form: form)
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
-    <.form :let={f} for={@form} phx-change="change">
+    <.form :let={f} for={@form} phx-change="change" phx-submit="submit">
       <.input field={@form[:name]} label="Name" />
 
       <div class="mt-10 p-2 border shadow">
@@ -103,6 +110,10 @@ defmodule HelloWeb.FormLive do
             <.input field={nested[:name]} label="Name" />
           </.inputs_for>
         </.inputs_for>
+      </div>
+
+      <div class="mt-10 p-2">
+        <.button>submit</.button>
       </div>
     </.form>
 
